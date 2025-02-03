@@ -14,10 +14,20 @@ const timeInput      = document.getElementById("timeInput")
 const sayiInput      = document.getElementById("sayiAnswer")
 const gridLayout     = document.getElementById("gridLayout")
 
+endTimeText.style.display    = "none"
+gridLayout.style.display     = "none"
+kartNextButton.style.display = "none"
+totalCorText.style.display   = "none"
+sayiNextButton.style.display = "none"
+corSizeText.style.display    = "none"
+sayiEndButton.style.display  = "none"
+sayiInput.style.display      = "none"
+
+
 
 const defaultOrderCardsImg = []
-for (let rank of "q23456789jqk") {
-  for (let suit of ["clubs", "diamonds", "hearts", "spades"]) defaultOrderCardsImg.push(suit + "_" + rank + ".png")
+for (let suit of ["club", "diamond", "heart", "spade"]) {
+  for (let rank of ["Ace", "2", "3", "4", "5","6","7","8","9","10","Jack","Queen","King"])   defaultOrderCardsImg.push("./assets/" + suit + rank + ".svg")
 }
 
 kartButton.addEventListener("click", () => showKartPage())
@@ -66,11 +76,12 @@ const showStartPage = () => {
 
 const showOrderCardsPage = () => {
     showCards(defaultOrderCardsImg, (cardResource, imageView) => {
+      console.log(userAnswer, cardResource)
       if (userAnswer.includes(cardResource)) {
           userAnswer.splice(userAnswer.indexOf(cardResource), 1);
           imageView.style.backgroundColor = 'transparent';
       } else {
-        userAnswer.push(imageView)
+        userAnswer.push(cardResource)
         imageView.style.backgroundColor = 'green';
       }
       if (userAnswer.length == 52) showStartPage()
@@ -94,21 +105,30 @@ const showNumbers = () => {
 }
 
 const hideInitialPage = () => {
-  kartButton.style.visibility   = "none"
-  sayiButton.style.visibility   = "none"
-  endTimeText.style.visibility  = "none"
-  totalCorText.style.visibility = "none"
-  timeInput.style.visibility    = "none"
-  corSizeText.style.visibility  = "none"
+  kartButton.style.display   = "none"
+  sayiButton.style.display   = "none"
+  endTimeText.style.display  = "none"
+  totalCorText.style.display = "none"
+  timeInput.style.display    = "none"
+  corSizeText.style.display  = "none"
 }
 
 
 const hidePages = () => {
-  userAnswer = []
-  expectedAnswer = []
-  gridLayout.style.display = "none";
-  sayiEndButton.display    = "none";
-  sayiInput.display        = "none";
+    userAnswer     = []
+    expectedAnswer = []
+    kartButton.display       = "none"
+    sayiButton.display       = "none"
+    sayiNextButton.display   = "none"
+    kartNextButton.display   = "none"
+    sayiEndButton.display    = "none"
+    endTimeText.display      = "none"
+    totalCorText.display     = "none"
+    corSizeText.display      = "none"
+    timeInput.display        = "none"
+    sayiInput.display        = "none"
+    gridLayout.display       = "none"
+    gridLayout.style.display = "none";
 }
 
 const performCommonsOfPages = () => {
@@ -121,9 +141,8 @@ const performCommonsOfPages = () => {
 
 const showTime = () => {
     endTimeText.style.display = "block";
-    const seconds = resultTime / 1000;
-    const milliSeconds = resultTime % 1000;
-    endTimeText.innerHTML = `Total Time: ${seconds}s ${milliSeconds}ms`
+    const seconds = (resultTime / 1000).toFixed(2);
+    endTimeText.innerHTML = `Total Time: ${seconds}s`
     startTime = 0
 }
 
@@ -140,9 +159,10 @@ const showCards = (cards, onCardClick) => {
     cards.forEach(cardResource => {
         const imageView = document.createElement("img");
         imageView.src = cardResource
-        imageView.style.width  = "120px";
-        imageView.style.height = "160px";
+        imageView.style.width  = "130px";
+        imageView.style.height = "130px";
         imageView.style.margin = "3px";
+        
         imageView.addEventListener("click", () => onCardClick(cardResource, imageView));
         gridLayout.appendChild(imageView)
     })
@@ -165,7 +185,7 @@ const showKartPage = () => {
 
 
 const showSize = () => {
-    corSizeText.style.visibility = "block";
+    corSizeText.style.display = "block";
     corSizeText.innerHTML = `Total Size: ${expectedAnswer.length}`
 }
 
@@ -184,3 +204,5 @@ const showSayiPage = () => {
     }, minute * 60 * 1000)
 }
 
+
+showStartPage()
