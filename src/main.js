@@ -42,7 +42,6 @@ sayiNextButton.addEventListener("click", () => showNumbers())
 sayiEndButton.addEventListener("click", () => {
     const cleanedText = sayiInput.value.replace(/[\s\n]/g, '');
     Array.from(cleanedText).forEach(char => userAnswer.push(char));
-    console.log(sayiInput.value)
     sayiInput.value = '';
     showStartPage()
 })
@@ -65,10 +64,13 @@ const getCorrectCount = (currentList, answerList) => {
 }
 
 const showStartPage = () => {
+  hidePages();
   showSize();
   showCorrect();
   showTime();
-  hidePages();
+  userAnswer     = []
+  expectedAnswer = []
+  keySequence = ""
   kartButton.style.display = "block";
   sayiButton.style.display = "block";
   timeInput.style.display  = "block";
@@ -76,7 +78,6 @@ const showStartPage = () => {
 
 const showOrderCardsPage = () => {
     showCards(defaultOrderCardsImg, (cardResource, imageView) => {
-      console.log(userAnswer, cardResource)
       if (userAnswer.includes(cardResource)) {
           userAnswer.splice(userAnswer.indexOf(cardResource), 1);
           imageView.style.backgroundColor = 'transparent';
@@ -92,6 +93,7 @@ const showNumbers = () => {
   gridLayout.innerHTML = ""
   const numbers = generateRandomString()
   numbers.forEach(el => {
+    el.toString().split('').forEach(x => expectedAnswer.push(x));
     const textView = document.createElement('div');
     textView.textContent = el;
     textView.style.fontSize = '18px';
@@ -115,20 +117,17 @@ const hideInitialPage = () => {
 
 
 const hidePages = () => {
-    userAnswer     = []
-    expectedAnswer = []
-    kartButton.display       = "none"
-    sayiButton.display       = "none"
-    sayiNextButton.display   = "none"
-    kartNextButton.display   = "none"
-    sayiEndButton.display    = "none"
-    endTimeText.display      = "none"
-    totalCorText.display     = "none"
-    corSizeText.display      = "none"
-    timeInput.display        = "none"
-    sayiInput.display        = "none"
-    gridLayout.display       = "none"
-    gridLayout.style.display = "none";
+    kartButton.style.display       = "none"
+    sayiButton.style.display       = "none"
+    sayiNextButton.style.display   = "none"
+    kartNextButton.style.display   = "none"
+    sayiEndButton.style.display    = "none"
+    endTimeText.style.display      = "none"
+    totalCorText.style.display     = "none"
+    corSizeText.style.display      = "none"
+    timeInput.style.display        = "none"
+    sayiInput.style.display        = "none"
+    gridLayout.style.display       = "none"
 }
 
 const performCommonsOfPages = () => {
@@ -152,17 +151,15 @@ const showCorrect = () => {
     totalCorText.innerHTML = `Total Correct: ${correctCount}`
 }
 
-
-
 const showCards = (cards, onCardClick) => {
     gridLayout.innerHTML = ""
     cards.forEach(cardResource => {
         const imageView = document.createElement("img");
         imageView.src = cardResource
+        imageView.id = cardResource
         imageView.style.width  = "130px";
-        imageView.style.height = "130px";
+        imageView.style.height = "125px";
         imageView.style.margin = "3px";
-        
         imageView.addEventListener("click", () => onCardClick(cardResource, imageView));
         gridLayout.appendChild(imageView)
     })
@@ -196,6 +193,7 @@ const showSayiPage = () => {
     sayiNextButton.style.display = "block"
     showNumbers()
     setTimeout(() => {
+        resultTime = performance.now() - startTime
         gridLayout.style.display     = "none"
         gridLayout.innerHTML         = ""
         sayiNextButton.style.display = "none" 
@@ -204,5 +202,29 @@ const showSayiPage = () => {
     }, minute * 60 * 1000)
 }
 
+
+let keySequence = ""
+const validKeys = "a23456789tjqkcsdh"
+const suitsMap = {"c": "club", "d": "diamond", "h": "heart", "s": "spade"}
+const rankMap  = {"a": "Ace", "2": "2", "3": "3", "4": "4", "5": "5", "6": "6",
+  "7": "7", "8": "8", "9": "9", "t": "10", "j": "Jack", "q": "Queen", "k": "King"
+}
+document.addEventListener("keydown", (event) => {
+  if (sayiNextButton.style.display == "block" && event.key == "Enter") showNumbers()
+  if (expectedAnswer.includes(defaultOrderCardsImg[0]) && validKeys.includes(event.key)) {
+    if (keySequence.length == 0) {
+      if ("a23456789tjqk".includes(event.key)) {
+        keySequence += rankMap[event.key];
+      }
+    }
+    else {
+      if ("cdsh".includes(event.key)) {
+        keySequence = suitsMap[event.key] + keySequence;
+        document.getElementById("./assets/" + keySequence + ".svg").click()
+      }
+    keySequence = ""
+    }
+  }
+});
 
 showStartPage()
